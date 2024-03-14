@@ -9,12 +9,11 @@ fetch('http://localhost:3000/api/products')
           <h3 class="productName">${product.name}</h3>
           <p class="productDescription">${product.description}.</p>
         </article>
-      </a>`
+      </a>`;
 
-        let itemsClass = document.querySelector(".items")
+        let itemsClass = document.querySelector(".items");
 
-        itemsClass.innerHTML += products
+        itemsClass.innerHTML += products;
+
 
     }));
-
-
