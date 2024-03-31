@@ -39,10 +39,6 @@ displayProduct()
 let addToCart = document.getElementById("addToCart");
 
 addToCart.addEventListener("click", ($event) => {
-    //Use LocalStorage
-    // Need to remember productID and color, and qty
-    // find method if the same prod is in the cart
-    //console.log($event.target);
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
     let productColor = document.getElementById("colors").value;
@@ -55,11 +51,8 @@ addToCart.addEventListener("click", ($event) => {
 
     if (cart.length > 0) {
         let inCart = false;
-
         // Check if item is already in the cart
         for (let i = 0; i < cart.length; i++) {
-           // console.log(cart[i].color)
-            //console.log(cart[i]._id)
             if (cart[i].color === productColor && cart[i]._id === productData._id) {
                 cart[i].quantity = cart[i].quantity + productQuantity
                 inCart = true

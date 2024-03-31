@@ -78,8 +78,6 @@ async function displayProductInfo() {
       cartItemElement.remove();
 
 
-
-      // DONE
       const updatedQty = totalQuantity - cartItem.quantity;
       totalQuantityElement.textContent = updatedQty;
 
@@ -94,8 +92,6 @@ async function displayProductInfo() {
 
     });
 
-    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
-
     const qtyItemElement = articleElement.querySelector(".itemQuantity");
     qtyItemElement.addEventListener("change", $event => {
 
@@ -103,16 +99,7 @@ async function displayProductInfo() {
       let totalQuantity = parseInt(totalQuantityElement.textContent || "0");
       let totalPrice = parseInt(totalPriceElement.textContent || "0");
 
-      //console.log($event.target.value);
-      //const changedQty = document.querySelector(".itemQuantity").value;
       const changedQty = parseInt($event.target.value);
-
-
-      //console.log(document.querySelector(".itemQuantity").value = $event.target.value);
-
-      /// localStorage update it first
-      //localStorage.setItem("key", JSON.stringify(changedQty));
-      //JSON.parse(localStorage.getItem('key'));
 
       const cartItemElement = $event.target.closest("article");
       const id = cartItemElement.dataset.id;
@@ -143,7 +130,118 @@ async function displayProductInfo() {
 
     });
   }
+
+  const firstNameItemElement = document.querySelector("#firstName");
+  const lastNameItemElement = document.querySelector("#lastName");
+  const addressItemElement = document.querySelector("#address");
+  const cityItemElement = document.querySelector("#city");
+  const emailItemElement = document.querySelector("#email");
+  const orderItemElement = document.querySelector("#order");
+
+
+  const firstNameErrorMsg = document.getElementById("firstNameErrorMsg");
+  const lastNameErrorMsg = document.getElementById("lastNameErrorMsg");
+  const addressErrorMsg = document.getElementById("addressErrorMsg");
+  const cityErrorMsg = document.getElementById("cityErrorMsg");
+  const emailErrorMsg = document.getElementById("emailErrorMsg");
+
+  let contact = {
+    firstName,
+    lastName,
+    address,
+    city,
+    email
+  };
+
+  let products = [];
+
+  firstNameItemElement.addEventListener("change", (event) => {
+    vaildateAlphaField(event, firstNameErrorMsg, contact, firstNameItemElement, "firstName");
+  })
+
+  lastNameItemElement.addEventListener("change", (event) => {
+    vaildateAlphaField(event, lastNameErrorMsg, contact, lastNameItemElement, "lastName");
+  })
+
+  addressItemElement.addEventListener("change", (event) => {
+    // if empty err, if not valid length err, if not valid regex err,
+    if (event.target.value.length == 0) {
+      addressErrorMsg.innerHTML = '';
+    }
+    if (event.target.value.match(/^[0-9]{1,6} [a-z A-Z]{3,25}$/)) {
+      addressErrorMsg.innerHTML = '';
+      contact.address = addressItemElement.value;
+
+    }
+    if (!event.target.value.match(/^[0-9]{1,6} [a-z A-Z]{3,25}$/)) {
+      addressErrorMsg.innerHTML = "Address must contain street number and street name";
+    }
+  })
+
+  cityItemElement.addEventListener("change", (event) => {
+    vaildateAlphaField(event, cityErrorMsg, contact, cityItemElement, "city");
+  })
+
+  emailItemElement.addEventListener("input", (event) => {
+    // if empty err, if not valid length err, if not valid regex err,
+    if (event.target.value.length == 0) {
+      emailErrorMsg.innerHTML = '';
+    } else if (event.target.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+      emailErrorMsg.innerHTML = "";
+      contact.email = emailItemElement.value;
+
+    }
+    if (!event.target.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+      emailErrorMsg.innerHTML = "Email must written in this format kanap@gmail.com";
+    }
+  })
+
+  let postOrder = {};
+
+  orderItemElement.addEventListener("click", async (event) => {
+    event.preventDefault();
+    let myCart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (firstNameErrorMsg.innerHTML.trim().length == 0 && lastNameErrorMsg.innerHTML.trim().length == 0 && addressErrorMsg.innerHTML.trim().length == 0 && cityErrorMsg.innerHTML.trim().length == 0 && emailErrorMsg.innerHTML.trim().length == 0) {
+
+      for (const cartItem of myCart) {
+        products.push(cartItem._id);
+      }
+
+      postOrder = { contact, products };
+
+    } else {
+      return false
+    }
+    const response = await fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(postOrder),
+    }).then(
+      response => { return response.json(); }
+    ).then(data => {
+      const orderId = data.orderId;
+      window.location.assign(`/front/html/confirmation.html?order-id=${orderId}`)
+      localStorage.clear();
+
+    })
+  }
+  )
+
 }
 displayProductInfo();
 
-
+function vaildateAlphaField(event, nameErrorMsg, contactInfo, nameItemElement, fieldName) {
+  // if empty err, if not valid length err, if not valid regex err
+  if (event.target.value.length == 0) {
+    nameErrorMsg.innerHTML = '';
+  } else if (event.target.value.length < 3 && event.target.value.length > 25) {
+    nameErrorMsg.innerHTML = "Name must be between 3 and 25 characters";
+  } else if (event.target.value.match(/^[a-z A-Z]{3,25}$/)) {
+    nameErrorMsg.innerHTML = "";
+    contactInfo[fieldName] = nameItemElement.value;
+  } else if (!event.target.value.match(/^[a-z A-Z]{3,25}$/)) {
+    nameErrorMsg.innerHTML = "Name must be between 3 and 25 characters and alpha";
+  }
+}
