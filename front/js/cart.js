@@ -8,7 +8,12 @@ let totalQuantity = parseInt(totalQuantityElement.textContent || "0");
 let totalPrice = parseInt(totalPriceElement.textContent || "0");
 const productCache = new Set();
 
-
+/**
+ *
+ *
+ * @param {*} productID ID of product
+ * @return {*} cartData of specific product by ID
+ */
 async function getProductById(productID) {
   const response = await fetch(
     `http://localhost:3000/api/products/${productID}`
@@ -16,7 +21,10 @@ async function getProductById(productID) {
   cartData = await response.json();
   return cartData;
 }
-
+/**
+ * displays all the product info in the cart
+ *
+ */
 async function displayProductInfo() {
   let myCart = JSON.parse(localStorage.getItem("cart")) || [];
   let imgURL = "";
@@ -232,6 +240,15 @@ async function displayProductInfo() {
 }
 displayProductInfo();
 
+/**
+ *
+ *
+ * @param {*} event
+ * @param {*} nameErrorMsg - generalized error message
+ * @param {*} contactInfo - contact information
+ * @param {*} nameItemElement - element of specfic item
+ * @param {*} fieldName - field name
+ */
 function vaildateAlphaField(event, nameErrorMsg, contactInfo, nameItemElement, fieldName) {
   // if empty err, if not valid length err, if not valid regex err
   if (event.target.value.length == 0) {

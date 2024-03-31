@@ -1,13 +1,17 @@
-// TODO add documentation - https://blog.shhdharmen.me/comments-usage-and-best-practices-in-javascript
-
 var productData = [];
 let product = window.location.search.split("?id=").join("");
-
+/**
+ *
+ * Return json response of the product
+ */
 async function getProduct() {
     const response = await fetch(`http://localhost:3000/api/products/${product}`);
     productData = await response.json();
 }
-
+/**
+ * Displays the image, price, description, color of a product
+ *
+ */
 async function displayProduct() {
     await getProduct()
 
